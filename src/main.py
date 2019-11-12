@@ -11,11 +11,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 from audio import record_audio
+import TX_script as tx
 
 plot = False
 
 # record audio
-record_audio(filename = "../audios/recv_audio.wav", channels = 1, seconds = 5)
+#record_audio(filename = "../audios/recv_audio.wav", channels = 1, seconds = 5)
 data, Fs = sf.read("../audios/teste_2fsk.wav")
 
 # stardard values
@@ -26,13 +27,14 @@ t_wave=np.arange(0,1/baudRate,1/Fs)
 wave1=np.cos(2*np.pi*F1*t_wave )
 wave2=np.cos(2*np.pi*F2*t_wave )
 
-start_bit = 0
-n_samples = 1000
+n_samples = 0
 end_bit   = int((n_samples/baudRate)*Fs)
 
+if end_bit == 0:
+    end_bit = len(data)
+
 # get data
-start = int((start_bit/baudRate)*Fs)
-data  = data[start:start+end_bit]
+data  = data[:end_bit]
 t     = np.arange(0,len(data)/Fs,1/Fs)
 
 if plot:
@@ -108,3 +110,9 @@ output[output < 0] = 0
 
 # get the optimized delta
 delta = np.argmax(np.correlate(output, header))
+
+msg_bits = (output.astype("uint8"))[delta+len(header):]
+
+msg = tx.bintotext(msg_bits.astype("str"))
+
+print(msg)

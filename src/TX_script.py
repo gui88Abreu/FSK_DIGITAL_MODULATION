@@ -1,5 +1,4 @@
 import numpy as np 
-import matplotlib.pyplot as plt
 from scipy import signal as sig
 import imageio
 import soundfile as sf
@@ -72,14 +71,6 @@ def escreve_bits4(bit_string,filename):
             sine_output=np.append(sine_output,wave4)
             
     sf.write(filename,sine_output,Fs)
-
-'''
-fig, axs = plt.subplots(2)
-fig.suptitle('FSK - F1:50Hz F2=200Hz')
-axs[0].plot(x, sine_output[0:len(x)])
-axs[1].plot(x, square_output[0:len(x)])
-plt.show()
-'''
 
 def texttobin(input_string):
     bit_string=[]
@@ -167,8 +158,9 @@ def add_preamble(bit_string,msg):
 
     return bits
 
-bitstr=texttobin('Uma noite destas, vindo da cidade para o Engenho Novo, encontrei num trem da Central um rapaz aqui do bairro, que eu conheco de vista e de chapeu.')
-bits=add_preamble(bitstr,0)
-print(list(bits.astype(int)))
-escreve_bits2(bits,'teste_2fsk.wav')
-escreve_bits4(bits,'teste_4fsk.wav')
+if __name__ == "__main__":
+    bitstr=texttobin('Uma noite destas, vindo da cidade para o Engenho Novo, encontrei num trem da Central um rapaz aqui do bairro, que eu conheco de vista e de chapeu.')
+    bits=add_preamble(bitstr,0)
+    print(list(bits.astype(int)))
+    escreve_bits2(bits,'teste_2fsk.wav')
+    escreve_bits4(bits,'teste_4fsk.wav')
