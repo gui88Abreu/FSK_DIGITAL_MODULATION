@@ -12,55 +12,99 @@ import numpy as np
 import soundfile as sf
 from audio import record_audio
 
+plot = False
+
+# record audio
 record_audio(filename = "../audios/recv_audio.wav", channels = 1, seconds = 5)
 data, Fs = sf.read("../audios/teste_2fsk.wav")
 
+# stardard values
 baudRate=20
-start_bit=40
-start=int((start_bit/baudRate)*Fs)
-data=data[start:start+int((10/baudRate)*Fs)]
-t=np.arange(0,len(data)/Fs,1/Fs)
-plt.figure(figsize=(32,32))
-plt.plot(t,data)
-plt.title('Sinal recebido')
-plt.show()
-
 F1=800
 F2=1200
-
 t_wave=np.arange(0,1/baudRate,1/Fs)
-wave1=np.cos(2*np.pi*F1*t_wave + np.pi/4)
-wave2=np.cos(2*np.pi*F2*t_wave + np.pi/4)
+wave1=np.cos(2*np.pi*F1*t_wave )
+wave2=np.cos(2*np.pi*F2*t_wave )
 
+start_bit = 0
+n_samples = 1000
+end_bit   = int((n_samples/baudRate)*Fs)
+
+# get data
+start = int((start_bit/baudRate)*Fs)
+data  = data[start:start+end_bit]
+t     = np.arange(0,len(data)/Fs,1/Fs)
+
+if plot:
+    plt.figure(figsize=(32,32))
+    plt.plot(t,data)
+    plt.title('Sinal recebido')
+    plt.show()
+
+# aplly matched filter
 matched1 = np.convolve(data,np.flip(wave1))
-plt.figure(figsize=(32,32))
-plt.plot(t,matched1[:len(t)],'r')
-plt.title('Saida do Filtro Casado1')
-plt.show()
-
 matched2 = np.convolve(data,np.flip(wave2))
-plt.figure(figsize=(32,32))
-plt.plot(t,matched2[:len(t)],'b')
-plt.title('Saida do Filtro Casado2')
-plt.show()
 
-phase_error = np.pi + np.min(np.arctan2(matched1, matched2))
-wave1=np.cos(2*np.pi*F1*t_wave + phase_error)
-wave2=np.cos(2*np.pi*F2*t_wave + phase_error)
-
-#Amostragem do filtro casado a cada período de bit
+# filter sampling of each bit
 step=int(Fs/baudRate)
 
 y1_samples = matched1[step::step]
 y2_samples = matched2[step::step]
 t_samples  = np.arange(step/Fs,t[-1]+step/Fs,step/Fs)
 
-plt.figure(figsize=(16,16))
-plt.plot(t_samples,y1_samples,'or')
-plt.title('Amostragem Filtro Casado2')
-plt.show()
+if plot:
+    plt.figure(figsize=(16,16))
+    plt.plot(t,matched1[:len(t)],'b')
+    plt.title('Saida e Amostragem do Filtro Casado1')
+    plt.plot(t_samples,y1_samples,'or')
+    plt.show()
+    
+    plt.figure(figsize=(16,16))
+    plt.plot(t,matched2[:len(t)],'b')
+    plt.title('Saida e Amostragem do Filtro Casado2')
+    plt.plot(t_samples,y2_samples,'or')
+    plt.show()
 
-plt.figure(figsize=(16,16))
-plt.plot(t_samples,y2_samples,'ob')
-plt.title('Amostragem Filtro Casado2')
-plt.show()
+Tb = (1/F1)*Fs/2 + 1
+matched1_abs = np.abs(matched1)/matched1.max()
+displ = [(np.append(matched1_abs, np.zeros(i)))[i:] for i in range(1,int(Tb))]
+matched1d = sum(displ)
+y1 = matched1_abs + matched1d
+
+Tb = (1/F2)*Fs/2 + 1
+matched2_abs = np.abs(matched2)/matched2.max()
+displ = [(np.append(matched2_abs, np.zeros(i)))[i:] for i in range(1,int(Tb))]
+matched2d = sum(displ)
+y2 = matched2_abs + matched2d
+
+y1_samples = y1[step::step]
+y2_samples = y2[step::step]
+t_samples  = np.arange(step/Fs,t[-1]+step/Fs,step/Fs)
+
+if plot:
+    plt.figure(figsize=(16,16))
+    plt.plot(t,y1[:len(t)],'b')
+    plt.plot(t_samples,y1_samples,'or')
+    plt.title('Deteccao e Amostragem da Envoltoria 1')
+    plt.show()
+    
+    plt.figure(figsize=(16,16))
+    plt.plot(t,y2[:len(t)],'b')
+    plt.plot(t_samples,y2_samples,'or') 
+    plt.title('Deteccao e Amostragem da Envoltoria 2')
+    plt.show()
+
+# load header
+header_file = open("../header.txt", 'r')
+h = header_file.readline()
+header_file.close()
+h = h.replace('[','').replace(']','')
+header = np.asarray([int(x) for x in h.split(',')])
+
+# make a decision
+output = y2_samples - y1_samples
+output[output > 0] = 1
+output[output < 0] = 0
+
+# get the optimized delta
+delta = np.argmax(np.correlate(output, header))
