@@ -10,24 +10,24 @@ Created on Sun Oct 27 22:33:41 2019
 import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
-from audio import record_audio
-import TX_script as tx
+from include.audio import record_audio
+import include.TX_script as tx
 
 plot = False
+n_samples = 0
 
 # record audio
-#record_audio(filename = "../audios/recv_audio.wav", channels = 1, seconds = 5)
-data, Fs = sf.read("../audios/teste_2fsk.wav")
+#record_audio(filename = "audios/recv_audio.wav", channels = 1, seconds = 5)
+data, Fs = sf.read("audios/teste_2fsk.wav")
 
 # stardard values
 baudRate=20
 F1=800
 F2=1200
 t_wave=np.arange(0,1/baudRate,1/Fs)
-wave1=np.cos(2*np.pi*F1*t_wave )
-wave2=np.cos(2*np.pi*F2*t_wave )
+wave1=np.cos(2*np.pi*F1*t_wave)
+wave2=np.cos(2*np.pi*F2*t_wave)
 
-n_samples = 0
 end_bit   = int((n_samples/baudRate)*Fs)
 
 if end_bit == 0:
@@ -69,13 +69,13 @@ if plot:
 
 Tb = (1/F1)*Fs/2 + 1
 matched1_abs = np.abs(matched1)/matched1.max()
-displ = [(np.append(matched1_abs, np.zeros(i)))[i:] for i in range(1,int(Tb))]
+displ = [(np.append(np.zeros(i), matched1_abs))[:-i] for i in range(1,int(Tb))]
 matched1d = sum(displ)
 y1 = matched1_abs + matched1d
 
 Tb = (1/F2)*Fs/2 + 1
 matched2_abs = np.abs(matched2)/matched2.max()
-displ = [(np.append(matched2_abs, np.zeros(i)))[i:] for i in range(1,int(Tb))]
+displ = [(np.append(np.zeros(i), matched2_abs))[:-i] for i in range(1,int(Tb))]
 matched2d = sum(displ)
 y2 = matched2_abs + matched2d
 
@@ -97,7 +97,7 @@ if plot:
     plt.show()
 
 # load header
-header_file = open("../header.txt", 'r')
+header_file = open("header.txt", 'r')
 h = header_file.readline()
 header_file.close()
 h = h.replace('[','').replace(']','')
@@ -113,6 +113,12 @@ delta = np.argmax(np.correlate(output, header))
 
 msg_bits = (output.astype("uint8"))[delta+len(header):]
 
-msg = tx.bintotext(msg_bits.astype("str"))
+#catch msg size
+msg_size_bits = np.array2string(msg_bits[15:31]).replace("[",'').replace(']','').replace(' ','')
+msg_size = int(msg_size_bits,2)
 
-print(msg)
+#It catches just the message and ignores the preamble
+msg = tx.bintotext(msg_bits[31:].astype("str"))
+
+print("Size of the Message:", msg_size, "bits")
+print("Message: " + msg)
