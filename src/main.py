@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 from include.audio import record_audio
-import include.TX_script as tx
+from include.app_decoder import  app_decoder
 
 plot = False
 n_samples = 0
@@ -117,8 +117,5 @@ msg_bits = (output.astype("uint8"))[delta+len(header):]
 msg_size_bits = np.array2string(msg_bits[15:31]).replace("[",'').replace(']','').replace(' ','')
 msg_size = int(msg_size_bits,2)
 
-#It catches just the message and ignores the preamble
-msg = tx.bintotext(msg_bits[31:].astype("str"))
-
 print("Size of the Message:", msg_size, "bits")
-print("Message: " + msg)
+app_decoder(msg_bits)
