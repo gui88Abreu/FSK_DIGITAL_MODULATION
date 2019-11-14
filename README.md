@@ -1,5 +1,5 @@
 # FSK_DIGITAL_MODULATION
-Final Project developed during the PRINCIPLES OF COMMUNICATION I course offered by University of Campinas at the second semester of 2019.
+Final Project developed during the PRINCIPLES OF COMMUNICATION I course offered by University of Campinas on the second semester of 2019.
 
 ![](figures/casado1.png)
 ![](figures/casado2.png)
