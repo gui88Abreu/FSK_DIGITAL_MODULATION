@@ -10,9 +10,8 @@ Created on Sun Oct 27 22:33:41 2019
 import matplotlib.pyplot as plt
 import numpy as np
 
-def FSK2_demodulation(data, Fs, plot = False, n_samples = 0):
-    # stardard values
-    baudRate=20
+def FSK2_demodulation(data, Fs, plot = False, n_samples = 0, baudRate = 20):
+    
     F1=800
     F2=1200
     t_wave=np.arange(0,1/baudRate,1/Fs)

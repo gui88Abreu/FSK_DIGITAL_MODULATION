@@ -10,9 +10,8 @@ Created on Sun Oct 27 22:33:41 2019
 import matplotlib.pyplot as plt
 import numpy as np
 
-def FSK4_demodulation(data, Fs, plot = False, n_samples = 0):
-    # stardard values
-    baudRate = 20
+def FSK4_demodulation(data, Fs, plot = False, n_samples = 0, baudRate = 20):
+    
     F1 = 600
     F2 = 800
     F3 = 1000
@@ -141,10 +140,10 @@ def FSK4_demodulation(data, Fs, plot = False, n_samples = 0):
     header = np.asarray([int(x) for x in h.split(',')])
     
     # make a decision
-    decision_matrix = np.stack((y1_samples,y2_samples,y3_samples,y4_samples))
+    decision_matrix = np.stack((y1_samples,y2_samples,y4_samples,y3_samples))
     output = np.argmax(decision_matrix, axis = 0)
     
-    output = np.asarray(list("".join([np.binary_repr(i) for i in output])), dtype="uint8")
+    output = np.asarray(list("".join([np.binary_repr(i, width=2) for i in output])), dtype="uint8")
     
     # get the optimized delta
     delta = np.argmax(np.correlate(output, header))
