@@ -15,10 +15,10 @@ from include.FSK4 import FSK4_demodulation
 from include.FSK2 import FSK2_demodulation
 
 # record audio
-record_audio(filename = "audios/recv_audio.wav", channels = 1, seconds = 70, fs = 24000)
+record_audio(filename = "audios/recv_audio.wav", channels = 1, seconds = 40, fs = 24000)
 data, Fs = sf.read("audios/recv_audio.wav")
 
-FSK = 2
+FSK = 4
 
 if FSK == 2:
     msg_bits = FSK2_demodulation(data, Fs)
