@@ -14,11 +14,20 @@ from include.app_decoder import  app_decoder
 from include.FSK4 import FSK4_demodulation
 from include.FSK2 import FSK2_demodulation
 
-# record audio
-record_audio(filename = "audios/recv_audio.wav", channels = 1, seconds = 40, fs = 24000)
-data, Fs = sf.read("audios/recv_audio-4FSK.wav")
-
 FSK = 4
+
+if FSK == 4:
+    wav_name = "audios/recv_audio-4FSK.wav"
+elif FSK == 2:
+    wav_name = "audios/recv_audio-2FSK.wav"
+else:
+    quit(str(FSK)+"-FSK isn't valid!")
+
+# record audio
+record_audio(filename = wav_name, channels = 1, seconds = 40, fs = 24000)
+data, Fs = sf.read(wav_name)
+
+
 
 if FSK == 2:
     msg_bits = FSK2_demodulation(data, Fs)
