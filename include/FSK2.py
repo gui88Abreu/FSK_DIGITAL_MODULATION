@@ -40,11 +40,11 @@ def FSK2_demodulation(data, Fs, plot = False, n_samples = 0, baudRate = 20):
     # filter sampling of each bit
     step=int(Fs/baudRate)
     
-    y1_samples = matched1[step::step]
-    y2_samples = matched2[step::step]
-    t_samples  = np.arange(step/Fs,t[-1]+step/Fs,step/Fs)
-    
     if plot:
+        y1_samples = matched1[step::step]
+        y2_samples = matched2[step::step]
+        t_samples  = np.arange(step/Fs,t[-1]+step/Fs,step/Fs)
+        
         plt.figure(figsize=(16,16))
         plt.plot(t,matched1[:len(t)],'b')
         plt.title('Saida e Amostragem do Filtro Casado1')

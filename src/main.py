@@ -16,7 +16,7 @@ from include.FSK2 import FSK2_demodulation
 
 # record audio
 record_audio(filename = "audios/recv_audio.wav", channels = 1, seconds = 40, fs = 24000)
-data, Fs = sf.read("audios/recv_audio.wav")
+data, Fs = sf.read("audios/recv_audio-4FSK.wav")
 
 FSK = 4
 

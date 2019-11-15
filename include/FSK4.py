@@ -46,13 +46,13 @@ def FSK4_demodulation(data, Fs, plot = False, n_samples = 0, baudRate = 20):
     # filter sampling of each bit
     step=int(Fs/baudRate)
     
-    y1_samples = matched1[step::step]
-    y2_samples = matched2[step::step]
-    y3_samples = matched3[step::step]
-    y4_samples = matched4[step::step]
-    t_samples  = np.arange(step/Fs,t[-1]+step/Fs,step/Fs)
-    
     if plot:
+        y1_samples = matched1[step::step]
+        y2_samples = matched2[step::step]
+        y3_samples = matched3[step::step]
+        y4_samples = matched4[step::step]
+        t_samples  = np.arange(step/Fs,t[-1]+step/Fs,step/Fs)
+        
         plt.figure(figsize=(16,16))
         plt.plot(t,matched1[:len(t)],'b')
         plt.title('Saida e Amostragem do Filtro Casado1')
@@ -89,13 +89,13 @@ def FSK4_demodulation(data, Fs, plot = False, n_samples = 0, baudRate = 20):
     matched2d = sum(displ)
     y2 = matched2_abs + matched2d
     
-    Tb = (1/F1)*Fs/2 + 1
+    Tb = (1/F3)*Fs/2 + 1
     matched3_abs = np.abs(matched3)/matched3.max()
     displ = [(np.append(np.zeros(i), matched3_abs))[:-i] for i in range(1,int(Tb))]
     matched3d = sum(displ)
     y3 = matched3_abs + matched3d
     
-    Tb = (1/F1)*Fs/2 + 1
+    Tb = (1/F4)*Fs/2 + 1
     matched4_abs = np.abs(matched4)/matched4.max()
     displ = [(np.append(np.zeros(i), matched4_abs))[:-i] for i in range(1,int(Tb))]
     matched4d = sum(displ)
