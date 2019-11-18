@@ -1,9 +1,6 @@
 # FSK_DIGITAL_MODULATION
 Final Project developed during the PRINCIPLES OF COMMUNICATION I course offered by University of Campinas on the second semester of 2019.
 
-![](figures/casado1.png)
-![](figures/casado2.png)
-
 # Projeto final de EE881
 ## Modulação digital FSK
 Até agora, nós vimos apenas modulações digitais em amplitude. Para o projeto nós vamos utilizar outra estratégia de modulação, onde a informação está contida na frequência da portadora. Para o modem acústico, essa estratégia é eficiente, pois como vimos em transmissões analógicas, modulações em frequência apresentam uma imunidade ao ruído muito superior a transmissões em amplitude. 
