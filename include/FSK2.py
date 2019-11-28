@@ -9,6 +9,18 @@ Created on Sun Oct 27 22:33:41 2019
 #importing libraries
 import matplotlib.pyplot as plt
 import numpy as np
+from include.app_decoder import app_decoder
+
+import os, sys
+
+class HiddenPrints:
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout.close()
+        sys.stdout = self._original_stdout
 
 def FSK2_demodulation(data, Fs, plot = False, n_samples = 0, baudRate = 20):
     
@@ -57,17 +69,8 @@ def FSK2_demodulation(data, Fs, plot = False, n_samples = 0, baudRate = 20):
         plt.plot(t_samples,y2_samples,'or')
         plt.show()
     
-    Tb = (1/F1)*Fs/2 + 1
-    matched1_abs = np.abs(matched1)/matched1.max()
-    displ = [(np.append(np.zeros(i), matched1_abs))[:-i] for i in range(1,int(Tb))]
-    matched1d = sum(displ)
-    y1 = matched1_abs + matched1d
-    
-    Tb = (1/F2)*Fs/2 + 1
-    matched2_abs = np.abs(matched2)/matched2.max()
-    displ = [(np.append(np.zeros(i), matched2_abs))[:-i] for i in range(1,int(Tb))]
-    matched2d = sum(displ)
-    y2 = matched2_abs + matched2d
+    y1 = np.convolve(np.abs(matched1),np.ones((int(len(t_wave)/2))))
+    y2 = np.convolve(np.abs(matched2),np.ones((int(len(t_wave)/2))))
     
     y1_samples = y1[step::step]
     y2_samples = y2[step::step]
@@ -99,8 +102,16 @@ def FSK2_demodulation(data, Fs, plot = False, n_samples = 0, baudRate = 20):
     output[output < 0] = 0
     
     # get the optimized delta
-    delta = np.argmax(np.correlate(output, header))
+    corr = np.correlate(output, header)
     
-    msg_bits = (output.astype("uint8"))[delta+len(header):]
+    with HiddenPrints():
+        ta = 0
+        while len(corr) > len(header) and ta < 0.7:
+            delta = np.argmax(corr)
+            msg_bits = (output.astype("uint8"))[delta+len(header):]
+            ta = app_decoder(msg_bits)
+            corr = np.delete(corr, delta)
+    app_decoder(msg_bits)
+    
     
     return msg_bits

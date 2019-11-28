@@ -26,18 +26,11 @@ else:
     quit(str(FSK)+"-FSK isn't valid!")
 
 # record audio
-record_audio(filename = wav_name, channels = 1, seconds = time, fs = 24000)
+#record_audio(filename = wav_name, channels = 1, seconds = time, fs = 24000)
 data, Fs = sf.read(wav_name)
 
 if FSK == 2:
     msg_bits = FSK2_demodulation(data, Fs)
-    
-    #catch msg size
-    msg_size_bits = np.array2string(msg_bits[15:31]).replace("[",'').replace(']','').replace(' ','')
-    msg_size = int(msg_size_bits,2)
-    
-    print("Size of the Message:", msg_size, "bits")
-    app_decoder(msg_bits)
     
 if FSK == 4:
     msg_bits = FSK4_demodulation(data, Fs, plot = False, n_samples = 0)

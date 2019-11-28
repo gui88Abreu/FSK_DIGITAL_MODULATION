@@ -77,29 +77,10 @@ def FSK4_demodulation(data, Fs, plot = False, n_samples = 0, baudRate = 20):
         plt.plot(t_samples,y4_samples,'or')
         plt.show()
     
-    Tb = (1/F1)*Fs/2 + 1
-    matched1_abs = np.abs(matched1)/matched1.max()
-    displ = [(np.append(np.zeros(i), matched1_abs))[:-i] for i in range(1,int(Tb))]
-    matched1d = sum(displ)
-    y1 = matched1_abs + matched1d
-    
-    Tb = (1/F2)*Fs/2 + 1
-    matched2_abs = np.abs(matched2)/matched2.max()
-    displ = [(np.append(np.zeros(i), matched2_abs))[:-i] for i in range(1,int(Tb))]
-    matched2d = sum(displ)
-    y2 = matched2_abs + matched2d
-    
-    Tb = (1/F3)*Fs/2 + 1
-    matched3_abs = np.abs(matched3)/matched3.max()
-    displ = [(np.append(np.zeros(i), matched3_abs))[:-i] for i in range(1,int(Tb))]
-    matched3d = sum(displ)
-    y3 = matched3_abs + matched3d
-    
-    Tb = (1/F4)*Fs/2 + 1
-    matched4_abs = np.abs(matched4)/matched4.max()
-    displ = [(np.append(np.zeros(i), matched4_abs))[:-i] for i in range(1,int(Tb))]
-    matched4d = sum(displ)
-    y4 = matched4_abs + matched4d
+    y1 = np.convolve(np.abs(matched1),np.ones((int(len(t_wave)/2))))
+    y2 = np.convolve(np.abs(matched2),np.ones((int(len(t_wave)/2))))
+    y3 = np.convolve(np.abs(matched3),np.ones((int(len(t_wave)/2))))
+    y4 = np.convolve(np.abs(matched4),np.ones((int(len(t_wave)/2))))
     
     y1_samples = y1[step::step]
     y2_samples = y2[step::step]
